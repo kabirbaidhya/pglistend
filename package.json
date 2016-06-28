@@ -1,0 +1,42 @@
+{
+    "name": "pglistend",
+    "version": "0.0.0",
+    "description": "pglistend - PostgreSQL LISTEN Daemon using Node.js/Systemd",
+    "scripts": {
+        "start": "nodemon --exec babel-node src/index.js --config=./config.yml",
+        "clean": "rm -rf dist/",
+        "build": "npm run clean && babel src/ -d dist/",
+        "prepublish": "npm run build"
+    },
+    "keywords": [
+        "postgresql",
+        "listen",
+        "notify",
+        "daemon",
+        "pglistend"
+    ],
+    "author": "Kabir Baidhya <kabirbaidhya@gmail.com>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kabirbaidhya/pglistend.git"
+    },
+    "dependencies": {
+        "pg": "^6.0.1",
+        "yamljs": "^0.2.8",
+        "yargs": "^4.7.1"
+    },
+    "devDependencies": {
+        "babel-cli": "^6.10.1",
+        "babel-preset-es2015": "^6.9.0",
+        "nodemon": "^1.9.2"
+    },
+    "preferGlobal": true,
+    "bin": {
+        "pglisten": "bin/pglisten"
+    },
+    "files": [
+        "bin/",
+        "dist/"
+    ]
+}
