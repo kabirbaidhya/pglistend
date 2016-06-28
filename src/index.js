@@ -1,13 +1,11 @@
 import {Client} from 'pg';
 import Yaml from 'yamljs';
-import yargs from 'yargs';
+
+// Import CLI arguments & the Listener
+import {argv} from './cli';
 import Listener from './Listener';
 
-let argv = yargs.usage('Usage: $0 --config=[filename]')
-    .demand(['config']).argv;
-
-let config = Yaml.load(argv.config);
-let listener = new Listener(config);
+let listener = new Listener(Yaml.load(argv.config));
 
 // Start listening
 listener.listen();
