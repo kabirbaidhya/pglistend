@@ -1,6 +1,6 @@
 # Change the following configuration parameters according to your need.
 
-# Postgresql Connection
+# postgresql connection
 connection:
     user: 'YOUR_USERNAME'
     database: 'DATABASE'
@@ -8,5 +8,5 @@ connection:
     port: 5432
     max: 10
 
-# The channel to LISTEN
-channel: 'CHANNEL_NAME'
+# channels to LISTEN to
+channels: [CHANNEL_1, CHANNEL_2]
