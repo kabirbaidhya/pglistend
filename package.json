@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "pglistend - PostgreSQL LISTEN Daemon using Node.js/Systemd",
   "scripts": {
-    "start": "nodemon --exec babel-node src/index.js --config=./config.yml",
+    "start": "nodemon --exec babel-node src/index.js --config=.pglistend.yml",
     "clean": "rm -rf dist/",
     "build": "npm run clean && babel src/ -d dist/",
     "prepublish": "npm run build"

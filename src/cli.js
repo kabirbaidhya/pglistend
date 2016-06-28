@@ -1,6 +1,7 @@
 import yargs from 'yargs';
+import {red} from 'chalk';
 
-export let argv = yargs
+export const argv = yargs
     .describe('config', 'Configuration file to use')
     .demand(['config'])
     .alias('h', 'help')
@@ -15,3 +16,6 @@ export let argv = yargs
     .usage('Usage: $0 --config=[filename]')
     .showHelpOnFail(false, 'Specify --help for available options')
     .argv;
+
+export const log = (...params) => console.log(...params);
+export const error = (...params) => console.error(...params.map(param => red(param)));

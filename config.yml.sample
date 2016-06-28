@@ -10,3 +10,8 @@ connection:
 
 # channels to LISTEN to
 channels: [CHANNEL_1, CHANNEL_2]
+
+# list of handler scripts (javascript)
+handlers:
+    - path/to/handlers.js
+    - path/to/another/handler-script.js

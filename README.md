@@ -3,6 +3,8 @@
 
 A lightweight PostgreSQL LISTEN Daemon built on using Nodejs and Systemd.
 
+**NOTE: This is under development, and is subject to change.**
+
 ## Installation
 
 ```bash
