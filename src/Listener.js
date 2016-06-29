@@ -9,8 +9,6 @@ class Listener {
     constructor(configFile) {
         this.config = Resolver.resolveConfig(configFile);
         this.handlers = Resolver.resolveHandlers(this.config);
-
-        console.log(this.handlers);
     }
 
     listen() {

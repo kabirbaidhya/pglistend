@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# Setup script for setting up the daemon
+# Need to run this with sudo access
 
 import os
 import subprocess
@@ -62,53 +64,79 @@ module.exports = {
 };
 '''
 
-# Output to &> /dev/null
+# Constants
 DEVNULL = open(os.devnull, 'w')
+COLOR_RED = '\033[0;31m'
+COLOR_END = '\033[0m'
+COLOR_GREY = '\033[0;37m'
+COLOR_GREEN = '\033[0;32m'
+COLOR_YELLOW = '\033[1;33m'
+COLOR_DARKGREY = '\033[1;30m'
+COLOR_LIGHTGREEN = '\033[1;32m'
 
-COLOR_FADE = "\033[37m"
-COLOR_END = "\033[0m"
+info_t = lambda s: '- ' + COLOR_GREEN + s + COLOR_END
+ok_t = lambda s: COLOR_GREEN + s + COLOR_END
+cmd_t = lambda s: COLOR_GREY +  s + COLOR_END
+out_t = lambda s: COLOR_DARKGREY + s + COLOR_END
+err_t = lambda s: COLOR_RED + s + COLOR_END
+
+# Just a simple command to execute shell commands and display the output
+def exec_cmd(cmd):
+    print cmd_t('> {}'.format(cmd))
+
+    p = Popen(cmd.split(' '), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+    output = ''
+
+    for line in iter(p.stdout.readline, b''):
+        print out_t('| ' + line.rstrip())
+        output += line
+
+    returncode = p.wait();
+
+    if returncode != 0:
+        raise CalledProcessError(returncode, cmd)
+
+    print ''
+
+    return output.rstrip()
 
 def ensure_package_installed(package_name):
-    print 'Ensure {0} is installed'.format(package_name)
-    print '\n> npm list --global {0}'.format(package_name)
+    print info_t('Ensure {0} is installed'.format(package_name))
 
     try:
         # Ensure pglistend package is installed on the system globally
-        result = check_call(['npm', 'list', '--global', package_name])
+        exec_cmd('npm list -g {}'.format(package_name))
     except CalledProcessError:
-        raise SystemExit('{0} not found. Please install it globally using: npm install --global {0}'.format(package_name))
+        raise SystemExit(
+            err_t('{0} not found. Please install it globally using: npm install --global {0}'.format(package_name))
+        )
 
 def get_exec_path(exec_name):
-    print '\n> which {0}'.format(exec_name)
-
     # Get full path of pglisten, to know where it is
-    p = Popen(['which', exec_name])
-    exec_path = p.communicate()[0]
-
-    print '\n'
-
-    # Halt if pglisten is not found
-    if p.returncode != 0:
-        raise SystemExit('Could not find pglisten. Make sure you have installed the package correctly.')
-
-    return exec_path
+    try:
+        return exec_cmd('which {0}'.format(exec_name))
+    except CalledProcessError:
+        raise SystemExit(
+            err_t('Could not find pglisten. Make sure you have installed the package correctly.')
+        )
 
 def mkdir(directory):
-    print 'Create directory {0}'.format(directory)
-    print '\n> mkdir -p {0}'.format(directory)
+    print info_t('Create directory {0}'.format(directory))
 
     try:
-        p = check_call(['mkdir', '-p', directory])
+        exec_cmd('mkdir -p {0}'.format(directory))
     except CalledProcessError:
-        raise SystemExit('Error creating directory {0}'.format(directory))
-
-    return
+        raise SystemExit(err_t('Error creating directory {0}'.format(directory)))
 
 def create_file(filename, contents):
-    print 'Write to file {0}'.format(filename)
+    print info_t('Write to file {0}'.format(filename))
 
-    with open(filename, 'w') as file:
-        file.write(contents)
+    try:
+        with open(filename, 'w') as file:
+            file.write(contents)
+    except Exception, e:
+        raise SystemExit(err_t('Error: ' + str(e)))
 
 def create_systemd_unit_file(filename):
     contents = systemd_template.format(
@@ -121,16 +149,26 @@ def create_systemd_unit_file(filename):
     create_file(filename, contents)
 
 def create_config_file(filename):
-    config = config_template.CONFIG_TEMPLATE.format(
+    config = config_template.format(
         handlers_file = HANDLERS_FILE
     )
 
     create_file(filename, config)
 
-# Installation Process
-print '\nInstallation - pglistend - Postgres LISTEN Daemon'
+def enable_daemon():
+    print info_t('Enable the service')
+
+    try:
+        # Ensure pglistend package is installed on the system globally
+        exec_cmd('systemctl enable {0}'.format(PACKAGE))
+    except CalledProcessError:
+        raise SystemExit(err_t('Error enabling the service'))
+
+###############################################################################
+
+# Setup Process
+print '\nSetup - pglistend - Postgres LISTEN Daemon'
 print '---------------------------------------------------'
-print ''
 # Ensure the package is installed globally on the system
 ensure_package_installed(PACKAGE)
 
@@ -149,4 +187,8 @@ create_config_file(CONFIG_FILE)
 # Create the systemd daemon unit file
 create_systemd_unit_file('/etc/systemd/system/pglistend.service')
 
-print 'All done!!'
+# Finally enable the daemon
+enable_daemon();
+
+print ok_t('All done!!')
+print 'Please manually edit the configuration file {0}. \nAnd finally start the service using {1}.'.format(out_t(CONFIG_FILE), out_t('systemctl start ' + PACKAGE))

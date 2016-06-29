@@ -14,6 +14,6 @@ $ npm install -g pglistend
 ## Command Line Usage
 After installing the package globally using `npm` you can run this as a CLI tool.
 ```bash
-pglisten --config=path/to/config-file.yml
+$ pglisten --config=path/to/config-file.yml
 ```
 But, you have to provide the configuration file to run `pglisten`. You can create one using the [sample config file](config.yml.sample).
