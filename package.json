@@ -1,7 +1,7 @@
 {
   "name": "pglistend",
   "version": "0.0.1-0",
-  "description": "pglistend - PostgreSQL LISTEN Daemon using Node.js/Systemd",
+  "description": "pglistend - Postgres LISTEN Daemon using Node.js/Systemd",
   "scripts": {
     "start": "nodemon --exec babel-node src/index.js --config=.pglistend.yml",
     "clean": "rm -rf dist/",
