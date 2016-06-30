@@ -1,5 +1,7 @@
 import yargs from 'yargs';
-import {red} from 'chalk';
+import path from 'path';
+import {spawnSync} from 'child_process';
+import {error} from './util';
 
 export const argv = yargs
     .describe('config', 'Configuration file to use')
@@ -15,7 +17,18 @@ export const argv = yargs
     // Usage
     .usage('Usage: $0 --config=[filename]')
     .showHelpOnFail(false, 'Specify --help for available options')
-    .argv;
 
-export const log = (...params) => console.log(...params);
-export const error = (...params) => console.error(...params.map(param => red(param)));
+    // Setup daemon command
+    .command('setup-daemon', 'Setup pglistend service on this system', {}, (argv) => {
+        let setupPath = path.join(__dirname + '/../setup');
+
+        // Run the setup script and display the output without buffering
+        let p = spawnSync('python', [setupPath], {stdio: 'inherit'});
+
+        if(p.status !== 0) {
+            error('Setup could not be completed.');
+        }
+
+        process.exit(p.status);
+    })
+    .argv;

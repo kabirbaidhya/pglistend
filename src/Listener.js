@@ -1,7 +1,6 @@
-import { Client } from 'pg';
-import { yellow, green, red, dim } from 'chalk';
-import { log, error } from './cli';
-import { isObject, isFunction } from './util';
+import {Client} from 'pg';
+import {yellow, green, red, dim} from 'chalk';
+import {log, error, isObject, isFunction} from './util';
 import Resolver from './Resolver';
 
 class Listener {
@@ -20,7 +19,6 @@ class Listener {
 
         client.on('notification', this.handleNotification.bind(this));
 
-
         this.listenTo(client, channels);
     }
 
@@ -29,8 +27,7 @@ class Listener {
             return JSON.parse(str);
         } catch (e) {
             throw new Error(
-                'Error parsing the JSON payload. NOTIFY payload should be a valid JSON.',
-                dim(str)
+                'Error parsing the JSON payload. NOTIFY payload should be a valid JSON.' + dim(str)
             );
         }
     }

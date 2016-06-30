@@ -16,15 +16,15 @@ $ npm install -g pglistend
 Now setup the daemon using this [setup script](setup). You may do any of the following to setup the daemon.
 
 ```bash
-# Option 1: Setup from the locally available setup script
-$ cat $(npm root -g)/pglistend/setup | sudo python
+# Option 1: Setup using `pglisten` CLI tool
+$ sudo pglisten setup-daemon
 
 # Option 2: curl the setup script from github and run it on the fly
 $ curl https://raw.githubusercontent.com/kabirbaidhya/pglistend/master/setup | sudo python
 ```
-Then,
- * Edit your configuration file `/etc/pglistend/config.yml`
- * Edit your handler script `/etc/pglistend/handlers.js` to register handlers for the channels you are LISTENing to
+When it's done,
+ * Edit configuration file `/etc/pglistend/config.yml`
+ * Edit handler script `/etc/pglistend/handlers.js` to register handlers for the channels you are LISTENing to
  * Finally, start the daemon using `sudo systemctl start pglistend`
 
  **NOTE**: You need `sudo` to run the daemon setup.
@@ -41,9 +41,6 @@ $ systemctl start pglistend
 
 # Stop the service
 $ systemctl stop pglistend
-
-# Restart the service
-$ systemctl restart pglistend
 
 # Enable the service (This will start the service on bootup)
 $ systemctl enable pglistend
