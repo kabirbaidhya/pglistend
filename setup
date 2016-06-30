@@ -164,6 +164,14 @@ def enable_daemon():
     except CalledProcessError:
         raise SystemExit(err_t('Error enabling the service'))
 
+def check_status():
+    print info_t('Check status')
+
+    try:
+        exec_cmd('systemctl status {0}'.format(PACKAGE))
+    except CalledProcessError:
+        raise SystemExit(err_t('Error checking status'))
+
 ###############################################################################
 
 # Setup Process
@@ -187,8 +195,9 @@ create_config_file(CONFIG_FILE)
 # Create the systemd daemon unit file
 create_systemd_unit_file('/etc/systemd/system/pglistend.service')
 
-# Finally enable the daemon
-enable_daemon();
+# Finally enable the daemon and check status
+enable_daemon()
+check_status()
 
 print ok_t('All done!!')
 print 'Please manually edit the configuration file {0}. \nAnd finally start the service using {1}.'.format(out_t(CONFIG_FILE), out_t('systemctl start ' + PACKAGE))
