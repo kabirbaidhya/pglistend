@@ -27,17 +27,17 @@ function resolveForScripts(scripts) {
 
     scripts.forEach(file => {
         try {
-            let handler = require(file);
+            let handlers = require(file);
 
-            if (!isObject(handler)) {
+            if (!isObject(handlers)) {
                 throw new Error(`Invalid handler script provided. "${file}"`);
             }
 
-            for (let key in handler) {
-                let callback = handler[key];
+            for (let key of Object.keys(handlers)) {
+                let callback = handlers[key];
 
                 if (!isFunction(callback)) {
-                    throw new Error(`Invalid callback function specified for key "${key}" on file "${file}"`);
+                    error(`Invalid callback function specified for key "${key}" on file "${file}"`);
 
                     continue;
                 }

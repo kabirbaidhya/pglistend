@@ -1,4 +1,3 @@
-
 import prog from 'commander';
 import {listen, setupDaemon} from './commands';
 

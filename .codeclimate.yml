@@ -1,0 +1,22 @@
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript
+  eslint:
+    enabled: true
+  fixme:
+    enabled: true
+  pep8:
+    enabled: true
+ratings:
+  paths:
+  - '**.js'
+  - '**.py'
+exclude_paths:
+- dist/*
+- lib/**/*
+- tests/**/*
+- coverage/**/*
+- node_modules/**/*

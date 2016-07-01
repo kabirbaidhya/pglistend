@@ -12,7 +12,7 @@ export function listen(args) {
 }
 
 export function setupDaemon(args) {
-    let setupPath = path.join(__dirname + '/../setup');
+    let setupPath = path.join(__dirname, '/../setup/setup.py');
     args = args.configure ? ['--configure'] : [];
 
     // Run the setup script and display the output without buffering

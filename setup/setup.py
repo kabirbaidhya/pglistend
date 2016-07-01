@@ -4,8 +4,7 @@
 
 import os
 import subprocess
-from pprint import pprint
-from subprocess import call, check_call, CalledProcessError, Popen
+from subprocess import CalledProcessError, Popen
 
 PACKAGE = 'pglistend'
 EXEC_NAME = 'pglisten'
@@ -14,7 +13,7 @@ CONFIG_FILE = BASE_DIRECTORY + '/config.yml'
 HANDLERS_FILE = BASE_DIRECTORY + '/handlers.js'
 
 # Systemd unit file template
-systemd_template = '''
+SYSTEMD_TEMPLATE = '''
 [Unit]
 Description={package} - Postgres LISTEN Daemon
 
@@ -32,7 +31,7 @@ WantedBy=multi-user.target
 '''
 
 # Configuration file template
-config_template = '''
+CONFIG_TEMPLATE = '''
 # Change the following configuration parameters according to your need.
 
 # postgresql connection
@@ -54,7 +53,7 @@ handlers:
 '''
 
 # Handlers file template
-handlers_template = '''
+HANDLERS_TEMPLATE = '''
 // Here you can define handlers for each of the channels
 // that are being LISTENed.
 module.exports = {
@@ -74,11 +73,26 @@ COLOR_YELLOW = '\033[1;33m'
 COLOR_DARKGREY = '\033[1;30m'
 COLOR_LIGHTGREEN = '\033[1;32m'
 
-info_t = lambda s: '- ' + COLOR_GREEN + s + COLOR_END
-ok_t = lambda s: COLOR_GREEN + s + COLOR_END
-cmd_t = lambda s: COLOR_GREY +  s + COLOR_END
-out_t = lambda s: COLOR_DARKGREY + s + COLOR_END
-err_t = lambda s: COLOR_RED + s + COLOR_END
+
+def info_t(s):
+    return '- ' + COLOR_GREEN + s + COLOR_END
+
+
+def ok_t(s):
+    return COLOR_GREEN + s + COLOR_END
+
+
+def cmd_t(s):
+    return COLOR_GREY + s + COLOR_END
+
+
+def out_t(s):
+    return COLOR_DARKGREY + s + COLOR_END
+
+
+def err_t(s):
+    return COLOR_RED + s + COLOR_END
+
 
 # Just a simple command to execute shell commands and display the output
 def exec_cmd(cmd):
@@ -92,7 +106,7 @@ def exec_cmd(cmd):
         print out_t('| ' + line.rstrip())
         output += line
 
-    returncode = p.wait();
+    returncode = p.wait()
 
     if returncode != 0:
         raise CalledProcessError(returncode, cmd)
@@ -101,6 +115,7 @@ def exec_cmd(cmd):
 
     return output.rstrip()
 
+
 def ensure_package_installed(package_name):
     print info_t('Ensure {0} is installed'.format(package_name))
 
@@ -108,18 +123,23 @@ def ensure_package_installed(package_name):
         # Ensure pglistend package is installed on the system globally
         exec_cmd('npm list -g {}'.format(package_name))
     except CalledProcessError:
-        raise SystemExit(
-            err_t('{0} not found. Please install it globally using: npm install --global {0}'.format(package_name))
-        )
+        raise SystemExit(err_t(
+            '{0} not found. '
+            'Please install it globally using: '
+            'npm install --global {0}'.format(package_name)
+        ))
+
 
 def get_exec_path(exec_name):
     # Get full path of pglisten, to know where it is
     try:
         return exec_cmd('which {0}'.format(exec_name))
     except CalledProcessError:
-        raise SystemExit(
-            err_t('Could not find pglisten. Make sure you have installed the package correctly.')
-        )
+        raise SystemExit(err_t(
+            'Could not find pglisten. '
+            'Make sure you have installed the package correctly.'
+        ))
+
 
 def mkdir(directory):
     print info_t('Create directory {0}'.format(directory))
@@ -127,33 +147,39 @@ def mkdir(directory):
     try:
         exec_cmd('mkdir -p {0}'.format(directory))
     except CalledProcessError:
-        raise SystemExit(err_t('Error creating directory {0}'.format(directory)))
+        raise SystemExit(
+            err_t('Error creating directory {0}'.format(directory))
+        )
+
 
 def create_file(filename, contents):
     print info_t('Write to file {0}'.format(filename))
 
     try:
-        with open(filename, 'w') as file:
-            file.write(contents)
+        with open(filename, 'w') as f:
+            f.write(contents)
     except Exception, e:
         raise SystemExit(err_t('Error: ' + str(e)))
 
-def create_systemd_unit_file(filename):
-    contents = systemd_template.format(
-        package = PACKAGE,
-        directory = BASE_DIRECTORY,
-        exec_path = exec_path,
-        config_path = CONFIG_FILE
+
+def create_systemd_unit_file(filename, exec_path):
+    contents = SYSTEMD_TEMPLATE.format(
+        package=PACKAGE,
+        directory=BASE_DIRECTORY,
+        exec_path=exec_path,
+        config_path=CONFIG_FILE
     )
 
     create_file(filename, contents)
 
+
 def create_config_file(filename):
-    config = config_template.format(
-        handlers_file = HANDLERS_FILE
+    config = CONFIG_TEMPLATE.format(
+        handlers_file=HANDLERS_FILE
     )
 
     create_file(filename, config)
+
 
 def enable_daemon():
     print info_t('Enable the service')
@@ -164,6 +190,7 @@ def enable_daemon():
     except CalledProcessError:
         raise SystemExit(err_t('Error enabling the service'))
 
+
 def check_status():
     print info_t('Check status')
 
@@ -172,32 +199,37 @@ def check_status():
     except CalledProcessError:
         raise SystemExit(err_t('Error checking status'))
 
-###############################################################################
 
+###############################################################################
 # Setup Process
 print '\nSetup - pglistend - Postgres LISTEN Daemon'
 print '---------------------------------------------------'
+
 # Ensure the package is installed globally on the system
 ensure_package_installed(PACKAGE)
 
 # Ensure the pglisten cli command exists and get its path
-exec_path = get_exec_path(EXEC_NAME)
+EXEC_PATH = get_exec_path(EXEC_NAME)
 
 # Create the application directory
 mkdir(BASE_DIRECTORY)
 
 # Create a default handlers file
-create_file(HANDLERS_FILE, handlers_template)
+create_file(HANDLERS_FILE, HANDLERS_TEMPLATE)
 
 # Create application config file
 create_config_file(CONFIG_FILE)
 
 # Create the systemd daemon unit file
-create_systemd_unit_file('/etc/systemd/system/pglistend.service')
+create_systemd_unit_file('/etc/systemd/system/pglistend.service', EXEC_PATH)
 
 # Finally enable the daemon and check status
 enable_daemon()
 check_status()
 
 print ok_t('All done!!')
-print 'Please manually edit the configuration file {0}. \nAnd finally start the service using {1}.'.format(out_t(CONFIG_FILE), out_t('systemctl start ' + PACKAGE))
+print(
+    'Please manually edit the configuration file {0}. \n'
+    'And finally start the service using {1}.'
+    .format(out_t(CONFIG_FILE), out_t('systemctl start ' + PACKAGE))
+)

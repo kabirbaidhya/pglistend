@@ -18,7 +18,7 @@ Now setup the daemon using any of the following command.
 $ sudo pglisten setup-daemon
 
 # Option 2: Alternatively use curl to download and run setup on the fly
-$ curl https://raw.githubusercontent.com/kabirbaidhya/pglistend/master/setup | sudo python
+$ curl https://raw.githubusercontent.com/kabirbaidhya/pglistend/master/setup/setup.py | sudo python
 ```
 **NOTE**: You need `sudo` to run the daemon setup.
 
