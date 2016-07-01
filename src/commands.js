@@ -16,7 +16,7 @@ export function setupDaemon(args) {
     args = args.configure ? ['--configure'] : [];
 
     // Run the setup script and display the output without buffering
-    let {status} = spawnSync('python', [setupPath, ...setupArgs], {stdio: 'inherit'});
+    let {status} = spawnSync('python', [setupPath, ...args], {stdio: 'inherit'});
 
     if (status !== 0) {
         error('Setup could not be completed.');

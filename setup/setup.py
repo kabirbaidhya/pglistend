@@ -195,9 +195,10 @@ def check_status():
     print info_t('Check status')
 
     try:
+        exec_cmd('systemctl is-enabled {0}'.format(PACKAGE))
         exec_cmd('systemctl status {0}'.format(PACKAGE))
     except CalledProcessError:
-        raise SystemExit(err_t('Error checking status'))
+        pass
 
 
 ###############################################################################
@@ -227,7 +228,7 @@ create_systemd_unit_file('/etc/systemd/system/pglistend.service', EXEC_PATH)
 enable_daemon()
 check_status()
 
-print ok_t('All done!!')
+print ok_t('\nAll done!!')
 print(
     'Please manually edit the configuration file {0}. \n'
     'And finally start the service using {1}.'
