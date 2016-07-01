@@ -1,6 +1,6 @@
 
 import Yaml from 'yamljs';
-import { log, error } from './cli';
+import {log, error} from './util';
 import {isObject, isFunction} from './util';
 
 class Resolver {

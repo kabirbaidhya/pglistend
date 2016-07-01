@@ -1,7 +1,8 @@
 import {Client} from 'pg';
 import {yellow, green, red, dim} from 'chalk';
-import {log, error, isObject, isFunction} from './util';
+
 import Resolver from './Resolver';
+import {log, error, isObject, isFunction} from './util';
 
 class Listener {
 
