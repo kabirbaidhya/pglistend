@@ -10,7 +10,7 @@ PACKAGE = 'pglistend'
 EXEC_NAME = 'pglisten'
 BASE_DIRECTORY = '/etc/pglistend'
 CONFIG_FILE = BASE_DIRECTORY + '/config.yml'
-HANDLERS_FILE = BASE_DIRECTORY + '/handlers.js'
+DEFAULT_LISTENER_FILE = BASE_DIRECTORY + '/listener.js'
 
 # Systemd unit file template
 SYSTEMD_TEMPLATE = '''
@@ -45,15 +45,15 @@ connection:
 # channels to LISTEN to
 channels: [CHANNEL_1, CHANNEL_2]
 
-# list of handler scripts (javascript)
-handlers:
-    - {handlers_file}
-#   You can add other handlers here
-#    - path/to/another/handler-script.js
+# list of listener scripts
+scripts:
+    - {default_listener}
+#   You can add another scripts here
+#    - path/to/another/listener.js
 '''
 
-# Handlers file template
-HANDLERS_TEMPLATE = '''
+# Listener script template
+DEFAULT_LISTENER_TEMPLATE = '''
 // Here you can define handlers for each of the channels
 // that are being LISTENed.
 module.exports = {
@@ -175,7 +175,7 @@ def create_systemd_unit_file(filename, exec_path):
 
 def create_config_file(filename):
     config = CONFIG_TEMPLATE.format(
-        handlers_file=HANDLERS_FILE
+        default_listener=DEFAULT_LISTENER_FILE
     )
 
     create_file(filename, config)
@@ -215,8 +215,8 @@ EXEC_PATH = get_exec_path(EXEC_NAME)
 # Create the application directory
 mkdir(BASE_DIRECTORY)
 
-# Create a default handlers file
-create_file(HANDLERS_FILE, HANDLERS_TEMPLATE)
+# Create a default listener file
+create_file(DEFAULT_LISTENER_FILE, DEFAULT_LISTENER_TEMPLATE)
 
 # Create application config file
 create_config_file(CONFIG_FILE)

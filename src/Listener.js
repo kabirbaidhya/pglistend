@@ -1,26 +1,35 @@
 import {Client} from 'pg';
+import {format} from 'util';
 import {yellow, green, red, dim} from 'chalk';
-
-import Resolver from './Resolver';
+import {halt} from './program';
 import {log, error, isObject, isFunction} from './util';
+
+const NO_HANDLERS_MESSAGE = 'Warning: No handlers are registered for channel "%s" yet.';
 
 class Listener {
 
-    constructor(configFile) {
-        this.config = Resolver.resolveConfig(configFile);
-        this.handlers = Resolver.resolveHandlers(this.config);
+    constructor(config, handlers) {
+        this.config = config;
+        this.handlers = handlers;
+        this.client = new Client(config.connection);
     }
 
     listen() {
-        const { connection, channels } = this.config;
-        let client = new Client(connection);
+        let {client, config: {connection, channels}} = this;
 
-        client.connect();
-        log('Connected to database %s', yellow(connection.database));
+        client.connect(err => {
+            if (err instanceof Error) {
+                halt(err);
+            }
 
+            log('Connected to database %s', yellow(connection.database));
+        });
+
+        client.on('notice', msg => log(msg));
         client.on('notification', this.handleNotification.bind(this));
 
-        this.listenTo(client, channels);
+        channels.forEach(channel => this.listenTo(channel));
+        // this.listenTo(client, channels);
     }
 
     parsePayload(str) {
@@ -33,28 +42,39 @@ class Listener {
         }
     }
 
-    handleNotification(n) {
-        const {channel, payload: str} = n;
+    invokeHandlers(channel, payload) {
+        const handlers = this.handlers[channel];
+
+        if (!Array.isArray(handlers)) {
+            throw new Error(format(NO_HANDLERS_MESSAGE, channel));
+        }
+
+        handlers.forEach(callback => callback(payload));
+    }
+
+    handleNotification(notification) {
+        const {channel, payload: str} = notification;
+
+        log('Received notification on channel %s: %s', green(channel), dim(str));
 
         try {
-            log('Received notification on channel %s: %s', green(channel), dim(str));
-
             const payload = this.parsePayload(str);
 
-            if (!Array.isArray(this.handlers[channel])) {
-                throw new Error(`Warning: Handler function has not been registered for channel "${channel}" yet.`);
-            }
-
-            this.handlers[channel].forEach(callback => callback(payload));
+            // Invoke all the handlers registered on the channel
+            this.invokeHandlers(channel, payload);
         } catch (e) {
             error(e.message);
         }
     }
 
-    listenTo(client, channels) {
-        channels.forEach(channel => {
-            client.query(`LISTEN ${channel}`)
-                .then(() => console.info('Started listening to channel %s', green(channel)));
+    listenTo(channel) {
+        this.client.query(`LISTEN ${channel}`).then(() => {
+            log('Started listening to channel %s', green(channel));
+
+            // Warn if handlers are not registered for the channels being listened to
+            if (!Array.isArray(this.handlers[channel])) {
+                error(format(NO_HANDLERS_MESSAGE, channel));
+            }
         });
     }
 }

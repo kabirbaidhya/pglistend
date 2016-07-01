@@ -10,10 +10,10 @@ class Resolver {
     }
 
     static resolveHandlers(config) {
-        let scripts = config.handlers || [];
+        let scripts = config.scripts || [];
 
         if (scripts.length === 0) {
-            error('Warning: No handler scripts are configured.');
+            error('Warning: No listener scripts are configured.');
 
             return {};
         }
@@ -30,7 +30,7 @@ function resolveForScripts(scripts) {
             let handlers = require(file);
 
             if (!isObject(handlers)) {
-                throw new Error(`Invalid handler script provided. "${file}"`);
+                throw new Error(`Invalid listener script provided. "${file}"`);
             }
 
             for (let key of Object.keys(handlers)) {

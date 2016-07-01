@@ -1,30 +1,29 @@
 # pglistend
 [![npm version](https://img.shields.io/npm/v/pglistend.svg?style=flat-square)](https://www.npmjs.com/package/pglistend) [![npm downloads](https://img.shields.io/npm/dt/pglistend.svg?style=flat-square)](https://www.npmjs.com/package/pglistend) [![Code Climate](https://img.shields.io/codeclimate/github/kabirbaidhya/pglistend.svg?style=flat-square)](https://codeclimate.com/github/kabirbaidhya/pglistend)
 
-A lightweight Postgre LISTEN Daemon built using [node](https://nodejs.org/en/), [node-postgres](https://github.com/brianc/node-postgres) and [systemd](https://wiki.debian.org/systemd).
+A lightweight Postgre LISTEN Daemon built on top of [node](https://nodejs.org/en/), [node-postgres](https://github.com/brianc/node-postgres) and [systemd](https://wiki.debian.org/systemd).
 
 ## Installation
 
-Firstly, install the npm package globally.
-
+Firstly, install the npm package globally. This will make `pglisten` CLI tool available on your system.
 ```bash
 $ npm install -g pglistend
 ```
-This will install the CLI tool `pglisten`.
-Now setup the daemon using any of the following command.
+
+Now setup the daemon using this command.
 
 ```bash
-# Option 1: Setup using `pglisten` CLI tool
 $ sudo pglisten setup-daemon
-
-# Option 2: Alternatively use curl to download and run setup on the fly
+```
+Or, alternatively you can `curl` the script and run it on the fly.
+```bash
 $ curl https://raw.githubusercontent.com/kabirbaidhya/pglistend/master/setup/setup.py | sudo python
 ```
 **NOTE**: You need `sudo` to run the daemon setup.
 
 When it's done,
- * Edit configuration `/etc/pglistend/config.yml`
- * Edit handler script `/etc/pglistend/handlers.js` to register handlers for the channels being LISTENed
+ * Edit the configuration file `/etc/pglistend/config.yml`
+ * Edit the listener script `/etc/pglistend/handlers.js` to register handlers for the channels being LISTENed
  * Finally, start it `sudo systemctl start pglistend`
 
 ## Usage
