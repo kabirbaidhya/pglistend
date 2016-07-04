@@ -3,6 +3,8 @@
 
 A lightweight Postgre LISTEN Daemon built on top of [node](https://nodejs.org/en/), [node-postgres](https://github.com/brianc/node-postgres) and [systemd](https://wiki.debian.org/systemd).
 
+Check this [simple tutorial](https://github.com/kabirbaidhya/pglistend/wiki/Tutorial) for getting started with pglistend. 
+
 ## Installation
 
 Firstly, install the npm package globally. This will make `pglisten` CLI tool available on your system.
@@ -19,11 +21,11 @@ Or, alternatively you can `curl` the script and run it on the fly.
 ```bash
 $ curl https://raw.githubusercontent.com/kabirbaidhya/pglistend/master/setup/setup.py | sudo python
 ```
-**NOTE**: You need `sudo` to run the daemon setup.
 
-When it's done,
- * Edit your [configuration](https://github.com/kabirbaidhya/pglistend/wiki/Configuration)
- * And finally start it using `sudo systemctl start pglistend`
+When it's done, edit your [configuration](https://github.com/kabirbaidhya/pglistend/wiki/Configuration). And finally start the service using
+```bash
+$ sudo systemctl start pglistend
+```
 
 ## Usage
 ### Managing the daemon
@@ -60,6 +62,8 @@ Or, you can simply `tail` the logs like this:
 $ tail /var/log/syslog | grep pglistend
 $ tail -f /var/log/syslog | grep pglistend
 ```
+
+Check [this](https://www.digitalocean.com/community/tutorials/how-to-use-journalctl-to-view-and-manipulate-systemd-logs) to read more about journalctl.
 
 ## Limitations
 * Right now, this only supports listening to a single database. Support for multiple databases needs to be implemented.
