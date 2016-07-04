@@ -22,9 +22,8 @@ $ curl https://raw.githubusercontent.com/kabirbaidhya/pglistend/master/setup/set
 **NOTE**: You need `sudo` to run the daemon setup.
 
 When it's done,
- * Edit the configuration file `/etc/pglistend/config.yml`
- * Edit the listener script `/etc/pglistend/handlers.js` to register handlers for the channels being LISTENed
- * Finally, start it `sudo systemctl start pglistend`
+ * Edit your [configuration](https://github.com/kabirbaidhya/pglistend/wiki/Configuration)
+ * And finally start it using `sudo systemctl start pglistend`
 
 ## Usage
 ### Managing the daemon
@@ -46,6 +45,9 @@ $ systemctl enable pglistend
 $ systemctl disable pglistend
 ```
 
+For more information about `systemd` check [this](https://wiki.debian.org/systemd#Managing_services_with_systemd)
+
+### Logs
 All logs are written to `syslog`.
 So, you can make use of `journalctl` here
 ```bash
@@ -59,11 +61,5 @@ $ tail /var/log/syslog | grep pglistend
 $ tail -f /var/log/syslog | grep pglistend
 ```
 
-For more information about `systemd` check [this](https://wiki.debian.org/systemd#Managing_services_with_systemd)
-
-### Command line Usage
-After installing the package globally using `npm` you can run this as a CLI tool.
-```bash
-$ pglisten --config=path/to/config-file.yml
-```
-But, you have to provide the configuration file to run `pglisten`. You can create one using the [sample config file](config.yml.sample).
+## Limitations
+* Right now, this only supports listening to a single database. Support for multiple databases needs to be implemented.
