@@ -49,7 +49,26 @@ class Listener {
             throw new Error(format(NO_HANDLERS_MESSAGE, channel));
         }
 
-        handlers.forEach(callback => callback(payload));
+        // Bind a callback helper to the callbacks
+        // to enable the users to perform various kinds of actions
+        // from the listener callbacks.
+        const helper = this.getCallbackHelper();
+
+        // TODO: Need to think about debouncing execution upto certain time interval
+        // on receiving same notification on a channel with same payload
+        // to reduce duplicate invocation of similar types of actions too frequently.
+
+        // TODO: Delegate CPU-intensive jobs to a task queue or a separate process.
+
+        handlers.forEach(callback => callback.bind(helper)(payload));
+    }
+
+    getCallbackHelper() {
+        return {
+            log,
+            error,
+            db: this.client
+        };
     }
 
     handleNotification(notification) {

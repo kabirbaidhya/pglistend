@@ -1,9 +1,13 @@
 # pglistend
 [![npm version](https://img.shields.io/npm/v/pglistend.svg?style=flat-square)](https://www.npmjs.com/package/pglistend) [![npm downloads](https://img.shields.io/npm/dt/pglistend.svg?style=flat-square)](https://www.npmjs.com/package/pglistend) [![Code Climate](https://img.shields.io/codeclimate/github/kabirbaidhya/pglistend.svg?style=flat-square)](https://codeclimate.com/github/kabirbaidhya/pglistend)
 
-A lightweight Postgre LISTEN Daemon built on top of [node](https://nodejs.org/en/), [node-postgres](https://github.com/brianc/node-postgres) and [systemd](https://wiki.debian.org/systemd).
+A lightweight Postgres LISTEN Daemon built on top of [node](https://nodejs.org/en/), [node-postgres](https://github.com/brianc/node-postgres) and [systemd](https://wiki.debian.org/systemd).
 
-Check this [simple tutorial](https://github.com/kabirbaidhya/pglistend/wiki/Tutorial) for getting started with pglistend. 
+It's a very simple yet generic daemon application that could be used in any project that makes use of Postgres' `LISTEN`/`NOTIFY` feature.
+
+It runs as a background process that does `LISTEN` on the configured channels on a database and allows to perform custom actions on receiving [`NOTIFY`](https://www.postgresql.org/docs/9.1/static/sql-notify.html) signals on those channels.
+
+Check this [simple tutorial](https://github.com/kabirbaidhya/pglistend/wiki/Tutorial) to get started with it.
 
 ## Installation
 
@@ -65,5 +69,7 @@ $ tail -f /var/log/syslog | grep pglistend
 
 Check [this](https://www.digitalocean.com/community/tutorials/how-to-use-journalctl-to-view-and-manipulate-systemd-logs) to read more about journalctl.
 
-## Limitations
-* Right now, this only supports listening to a single database. Support for multiple databases needs to be implemented.
+## TODOs / Limitations as of now
+* Multiple database support as right now it supports single database only.
+* Delegate CPU-intensive tasks (mostly queries) to separate thread or message queue most likely. [Here's why](http://stackoverflow.com/questions/3491811/node-js-and-cpu-intensive-requests/3536183#answer-3491931)
+* Debounce callback invocation with some configurable time-interval.
