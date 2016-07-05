@@ -7,7 +7,7 @@ It's a very simple yet generic daemon application that could be used in any proj
 
 It runs as a background process that does `LISTEN` on the configured channels on a database and allows to perform custom actions on receiving [`NOTIFY`](https://www.postgresql.org/docs/9.1/static/sql-notify.html) signals on those channels.
 
-Check this [simple tutorial](https://github.com/kabirbaidhya/pglistend/wiki/Tutorial) to get started with it.
+Check this [simple tutorial](https://github.com/kabirbaidhya/pglistend/wiki/Tutorial:-Basics) to get started with it.
 
 ## Installation
 
@@ -66,10 +66,14 @@ Or, you can simply `tail` the logs like this:
 $ tail /var/log/syslog | grep pglistend
 $ tail -f /var/log/syslog | grep pglistend
 ```
-
 Check [this](https://www.digitalocean.com/community/tutorials/how-to-use-journalctl-to-view-and-manipulate-systemd-logs) to read more about journalctl.
 
-## TODOs / Limitations as of now
+
+## Tutorials
+1. [Getting Started](https://github.com/kabirbaidhya/pglistend/wiki/Tutorial:-Basics)
+2. [Performing custom actions](https://github.com/kabirbaidhya/pglistend/wiki/Tutorial:-Custom-actions)
+
+## TODOs
 * Multiple database support as right now it supports single database only.
 * Delegate CPU-intensive tasks (mostly queries) to separate thread or message queue most likely. [Here's why](http://stackoverflow.com/questions/3491811/node-js-and-cpu-intensive-requests/3536183#answer-3491931)
 * Debounce callback invocation with some configurable time-interval.
