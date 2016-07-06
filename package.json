@@ -6,8 +6,8 @@
     "lint:js": "eslint .",
     "py:pep8": "pycodestyle setup/setup.py && pylint setup/setup.py",
     "lint": "npm run lint:js && npm run py:pep8",
-    "dev": "nodemon --exec babel-node src/index.js --config=.pglistend.yml",
-    "start": "npm run lint && npm run dev",
+    "dev": "babel-node src/index.js --config=.pglistend.yml",
+    "start": "nodemon --exec 'npm run lint && npm run dev'",
     "clean": "rm -rf dist/",
     "build": "npm run clean && babel src/ -d dist/",
     "prepublish": "npm run build"
