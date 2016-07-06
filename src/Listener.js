@@ -1,8 +1,9 @@
-import {Client} from 'pg';
+import {Client, Pool} from 'pg';
 import {format} from 'util';
 import {yellow, green, red, dim} from 'chalk';
 import {halt} from './program';
 import {log, error, isObject, isFunction} from './util';
+import query from './query';
 
 const NO_HANDLERS_MESSAGE = 'Warning: No handlers are registered for channel "%s" yet.';
 
@@ -12,6 +13,7 @@ class Listener {
         this.config = config;
         this.handlers = handlers;
         this.client = new Client(config.connection);
+        this.pool = new Pool(config.connection);
     }
 
     listen() {
@@ -67,7 +69,7 @@ class Listener {
         return {
             log,
             error,
-            db: this.client
+            query: query.bind(this.pool)
         };
     }
 
