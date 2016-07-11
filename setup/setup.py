@@ -123,11 +123,7 @@ def ensure_package_installed(package_name):
         # Ensure pglistend package is installed on the system globally
         exec_cmd('npm list -g {}'.format(package_name))
     except CalledProcessError:
-        raise SystemExit(err_t(
-            '{0} not found. '
-            'Please install it globally using: '
-            'npm install --global {0}'.format(package_name)
-        ))
+        print err_t('Warning: npm list returned non-zero exit code.')
 
 
 def get_exec_path(exec_name):
@@ -137,7 +133,8 @@ def get_exec_path(exec_name):
     except CalledProcessError:
         raise SystemExit(err_t(
             'Could not find pglisten. '
-            'Make sure you have installed the package correctly.'
+            'Make sure you have installed the package correctly using: '
+            'npm install --global {}'.format(PACKAGE)
         ))
 
 
