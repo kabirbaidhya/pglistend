@@ -34,13 +34,18 @@ class Listener {
         // this.listenTo(client, channels);
     }
 
+    /**
+     * Parses the payload and returns it.
+     * If it's a valid json, parse it and return the decoded object.
+     * Otherwise, just return the payload string as it is.
+     *
+     * @returns {object|string}
+     */
     parsePayload(str) {
         try {
             return JSON.parse(str);
         } catch (e) {
-            throw new Error(
-                'Error parsing the JSON payload. NOTIFY payload should be a valid JSON.' + dim(str)
-            );
+            return str;
         }
     }
 
