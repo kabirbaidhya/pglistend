@@ -16,6 +16,7 @@ DEFAULT_LISTENER_FILE = BASE_DIRECTORY + '/listener.js'
 SYSTEMD_TEMPLATE = '''
 [Unit]
 Description={package} - Postgres LISTEN Daemon
+After=postgresql.service
 
 [Service]
 WorkingDirectory={directory}
