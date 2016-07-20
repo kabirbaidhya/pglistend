@@ -76,4 +76,3 @@ Check [this](https://www.digitalocean.com/community/tutorials/how-to-use-journal
 ## TODOs
 * Multiple database support as right now it supports single database only.
 * Delegate CPU-intensive tasks (mostly queries) to separate thread or message queue most likely. [Here's why](http://stackoverflow.com/questions/3491811/node-js-and-cpu-intensive-requests/3536183#answer-3491931)
-* Debounce callback invocation with some configurable time-interval.
