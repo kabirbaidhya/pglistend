@@ -5,6 +5,7 @@ import {halt} from './program';
 import {log, error} from './util';
 
 const NO_HANDLERS_MESSAGE = 'Warning: No handlers are registered for channel "%s" yet.';
+const NO_CHANNELS_TO_LISTEN = 'No channels to LISTEN to';
 
 class Listener {
 
@@ -16,6 +17,10 @@ class Listener {
 
     listen() {
         let {client, config: {connection, channels}} = this;
+
+        if (channels.length === 0) {
+            throw new Error(NO_CHANNELS_TO_LISTEN);
+        }
 
         client.connect(err => {
             if (err instanceof Error) {
