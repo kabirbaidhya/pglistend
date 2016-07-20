@@ -5,6 +5,7 @@ import {spawnSync} from 'child_process';
 
 import Listener from './Listener';
 import {error} from './util';
+import * as msg from './messages/common';
 import {resolveConfig, resolveHandlers} from './resolver';
 
 /**
@@ -35,7 +36,7 @@ export function run() {
  * Note: Should be called only in case of fatal error.
  */
 export function halt(err) {
-    error(err || 'An error occured');
+    error(err || msg.GENERIC_ERROR_MESSAGE);
     process.exit(1);
 }
 
@@ -54,7 +55,7 @@ function setupDaemon(args) {
     let {status} = spawnSync('python', [setupPath, ...args], {stdio: 'inherit'});
 
     if (status !== 0) {
-        error('Setup could not be completed.');
+        error(msg.SETUP_ERROR);
     }
 
     process.exit(status);

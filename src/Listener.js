@@ -4,8 +4,7 @@ import {yellow, green, red, dim} from 'chalk';
 import {halt} from './program';
 import {log, error} from './util';
 
-const NO_HANDLERS_MESSAGE = 'Warning: No handlers are registered for channel "%s" yet.';
-const NO_CHANNELS_TO_LISTEN = 'No channels to LISTEN to';
+import * as msg from './messages/common';
 
 class Listener {
 
@@ -19,7 +18,7 @@ class Listener {
         let {client, config: {connection, channels}} = this;
 
         if (channels.length === 0) {
-            throw new Error(NO_CHANNELS_TO_LISTEN);
+            throw new Error(msg.NO_CHANNELS_TO_LISTEN);
         }
 
         client.connect(err => {
@@ -27,7 +26,7 @@ class Listener {
                 halt(err);
             }
 
-            log('Connected to database %s', yellow(connection.database));
+            log(msg.DATABASE_CONNECTED, yellow(connection.database));
         });
 
         client.on('notice', msg => log(msg));
@@ -55,7 +54,7 @@ class Listener {
         const handlers = this.handlers[channel];
 
         if (!Array.isArray(handlers)) {
-            throw new Error(format(NO_HANDLERS_MESSAGE, channel));
+            throw new Error(format(msg.NO_HANDLERS_FOUND, channel));
         }
 
         // TODO: Delegate CPU-intensive jobs to a task queue or a separate process.
@@ -66,7 +65,7 @@ class Listener {
     handle(notification) {
         const {channel, payload: str} = notification;
 
-        log('Received notification on channel %s: %s', green(channel), dim(str));
+        log(msg.RECEIVED_NOTIFICATION, green(channel), dim(str || '(empty)'));
 
         try {
             const payload = this.parsePayload(str);
@@ -80,11 +79,11 @@ class Listener {
 
     listenTo(channel) {
         this.client.query(`LISTEN ${channel}`).then(() => {
-            log('Started listening to channel %s', green(channel));
+            log(msg.STARTED_LISTENING, green(channel));
 
             // Warn if handlers are not registered for the channels being listened to
             if (!Array.isArray(this.handlers[channel])) {
-                error(format(NO_HANDLERS_MESSAGE, channel));
+                error(format(msg.NO_HANDLERS_FOUND, channel));
             }
         });
     }

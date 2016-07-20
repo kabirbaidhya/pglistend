@@ -1,5 +1,4 @@
 
-import {error} from './util';
 import {run, halt} from './program';
 
 try {
