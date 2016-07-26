@@ -1,6 +1,6 @@
 {
   "name": "pglistend",
-  "version": "0.0.6-0",
+  "version": "0.1.0-0",
   "description": "pglistend - Postgres LISTEN Daemon using Node.js/Systemd",
   "scripts": {
     "lint:js": "eslint .",

@@ -73,6 +73,16 @@ Check [this](https://www.digitalocean.com/community/tutorials/how-to-use-journal
 1. [Getting Started](https://github.com/kabirbaidhya/pglistend/wiki/Tutorial:-Basics)
 2. [Performing custom actions](https://github.com/kabirbaidhya/pglistend/wiki/Tutorial:-Custom-actions)
 
+## Testing
+1. Clone repository: `git clone git@github.com:kabirbaidhya/pglistend.git`
+2. Install dependencies: `npm install`
+3. Install other required packages:
+    - `pycodestyle`: `pip install pycodestyle` or `pip install --upgrade pycodestyle` [[Reference](https://github.com/PyCQA/pycodestyle)]
+    - `pylint`: `sudo apt-get install pylint` [[Reference](https://www.pylint.org/#install)]
+4. Copy configuration file `config.yml.sample` and rename to `.pglistend.yml` in root directory. Update database credentials, channels and location of scripts.
+5. To prepare a script, copy `listener.js.sample` and save it as `listener.js`, or anything you wish, to any location(recommended to save outside project directory). Update the preferred channels and instructions in the script. Also, update the location of script in `.pglistend.yml`.
+6. From terminal in root directory, run: `npm start`. You can see the logs in terminal as the channels hit the queries when the `notify` operation is called on.
+
 ## TODOs
 * Multiple database support as right now it supports single database only.
 * Delegate CPU-intensive tasks (mostly queries) to separate thread or message queue most likely. [Here's why](http://stackoverflow.com/questions/3491811/node-js-and-cpu-intensive-requests/3536183#answer-3491931)
