@@ -2,10 +2,9 @@ import {Client, Pool} from 'pg';
 import {format} from 'util';
 import {yellow, green, red, dim} from 'chalk';
 import {halt} from './program';
-import {log, error, isObject, isFunction} from './util';
-import query from './query';
+import {log, error} from './util';
 
-const NO_HANDLERS_MESSAGE = 'Warning: No handlers are registered for channel "%s" yet.';
+import * as msg from './messages/common';
 
 class Listener {
 
@@ -13,25 +12,27 @@ class Listener {
         this.config = config;
         this.handlers = handlers;
         this.client = new Client(config.connection);
-        this.pool = new Pool(config.connection);
     }
 
     listen() {
         let {client, config: {connection, channels}} = this;
+
+        if (channels.length === 0) {
+            throw new Error(msg.NO_CHANNELS_TO_LISTEN);
+        }
 
         client.connect(err => {
             if (err instanceof Error) {
                 halt(err);
             }
 
-            log('Connected to database %s', yellow(connection.database));
+            log(msg.DATABASE_CONNECTED, yellow(connection.database));
         });
 
         client.on('notice', msg => log(msg));
-        client.on('notification', this.handleNotification.bind(this));
+        client.on('notification', notification => this.handle(notification));
 
         channels.forEach(channel => this.listenTo(channel));
-        // this.listenTo(client, channels);
     }
 
     /**
@@ -53,35 +54,18 @@ class Listener {
         const handlers = this.handlers[channel];
 
         if (!Array.isArray(handlers)) {
-            throw new Error(format(NO_HANDLERS_MESSAGE, channel));
+            throw new Error(format(msg.NO_HANDLERS_FOUND, channel));
         }
 
-        // Bind a callback helper to the callbacks
-        // to enable the users to perform various kinds of actions
-        // from the listener callbacks.
-        const helper = this.getCallbackHelper();
-
-        // TODO: Need to think about debouncing execution upto certain time interval
-        // on receiving same notification on a channel with same payload
-        // to reduce duplicate invocation of similar types of actions too frequently.
-
         // TODO: Delegate CPU-intensive jobs to a task queue or a separate process.
-
-        handlers.forEach(callback => callback.bind(helper)(payload));
+        
+        handlers.forEach(callback => callback(payload));
     }
 
-    getCallbackHelper() {
-        return {
-            log,
-            error,
-            query: query.bind(this.pool)
-        };
-    }
-
-    handleNotification(notification) {
+    handle(notification) {
         const {channel, payload: str} = notification;
 
-        log('Received notification on channel %s: %s', green(channel), dim(str));
+        log(msg.RECEIVED_NOTIFICATION, green(channel), dim(str || '(empty)'));
 
         try {
             const payload = this.parsePayload(str);
@@ -95,11 +79,11 @@ class Listener {
 
     listenTo(channel) {
         this.client.query(`LISTEN ${channel}`).then(() => {
-            log('Started listening to channel %s', green(channel));
+            log(msg.STARTED_LISTENING, green(channel));
 
             // Warn if handlers are not registered for the channels being listened to
             if (!Array.isArray(this.handlers[channel])) {
-                error(format(NO_HANDLERS_MESSAGE, channel));
+                error(format(msg.NO_HANDLERS_FOUND, channel));
             }
         });
     }

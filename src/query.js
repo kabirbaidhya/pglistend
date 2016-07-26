@@ -8,22 +8,22 @@ export default function query(sql, values) {
         this.connect((err, client, done) => {
             if(err) {
                 let message = `Connection Error: ${err}`;
-
+                
                 reject(message);
                 error(message);
-
+                
                 return;
             }
 
             client.query(sql, values, (err, result) => {
                 done();
-
+                
                 if (err) {
                     let message = `Query error: ${err}`;
-
+                    
                     reject(message);
                     error(message);
-
+                    
                     return;
                 }
 

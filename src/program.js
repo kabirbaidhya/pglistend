@@ -3,9 +3,10 @@ import {Client} from 'pg';
 import prog from 'commander';
 import {spawnSync} from 'child_process';
 
-import Resolver from './Resolver';
 import Listener from './Listener';
-import {error, isString} from './util';
+import {error} from './util';
+import * as msg from './messages/common';
+import {resolveConfig, resolveHandlers} from './resolver';
 
 /**
  * Run the program
@@ -15,7 +16,7 @@ export function run() {
         .description('pglisten - Postgres LISTEN CLI tool')
         .usage('--config=<path>')
         .option('-c, --config <path>', 'Configuration file to use');
-
+    
     prog.command('setup-daemon')
         .description('Setup pglistend service on this system')
         .option('-C, --configure', 'Configure the daemon during setup')
@@ -35,14 +36,13 @@ export function run() {
  * Note: Should be called only in case of fatal error.
  */
 export function halt(err) {
-    error(err || 'An error occured');
+    error(err || msg.GENERIC_ERROR_MESSAGE);
     process.exit(1);
 }
 
 function listen(args) {
-    let config = Resolver.resolveConfig(args.config);
-    let handlers = Resolver.resolveHandlers(config);
-    let listener = new Listener(config, handlers);
+    let config = resolveConfig(args.config);
+    let listener = new Listener(config, resolveHandlers(config));
 
     listener.listen();
 }
@@ -55,7 +55,7 @@ function setupDaemon(args) {
     let {status} = spawnSync('python', [setupPath, ...args], {stdio: 'inherit'});
 
     if (status !== 0) {
-        error('Setup could not be completed.');
+        error(msg.SETUP_ERROR);
     }
 
     process.exit(status);
