@@ -42,9 +42,13 @@ export function halt(err) {
 
 function listen(args) {
     let config = resolveConfig(args.config);
-    let listener = new Listener(config, resolveHandlers(config));
 
-    listener.listen();
+    for (let i = 0; i < config.connections.length; i++) {
+        let configuration = config.connections[i];
+        let listener = new Listener(configuration, resolveHandlers(configuration));
+
+        listener.listen();
+    }
 }
 
 function setupDaemon(args) {

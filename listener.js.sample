@@ -1,4 +1,6 @@
 module.exports = function(h) {
+    const {throttle, log, query} = h;
+
     return {
         'channel_1': function(payload) {
             // Do something
@@ -6,6 +8,14 @@ module.exports = function(h) {
 
         'channel_2': function(payload) {
             // Do something
-        }
+        },
+
+        'channel_3': throttle((payload) => {
+            // Do something
+        }, 3000),
+
+        'channel_4': throttle((payload) => {
+            // Do something
+        }, 3000, { 'leading': false, 'trailing': true })
     };
 };
