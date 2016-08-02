@@ -1,0 +1,15 @@
+# database connection
+connection:
+    database: DATABASE_NAME
+    user: YOUR_USERNAME
+    password: PASSWORD
+    port: 5432
+    max: 2
+
+# channels to LISTEN to
+channels: [CHANNEL_1, CHANNEL_2]
+
+# list of listener scripts to be included
+scripts:
+    - /path/to/listener/script.js
+#    - path/to/another/listener-script.js

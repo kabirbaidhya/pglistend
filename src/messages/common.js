@@ -5,3 +5,6 @@ export const DATABASE_CONNECTED = 'Connected to database %s';
 export const STARTED_LISTENING = 'Started listening to channel %s';
 export const SETUP_ERROR = 'Setup could not be completed.';
 export const GENERIC_ERROR_MESSAGE = 'An error occurred.';
+export const LOADED_CONFIG_FILE = 'Loaded configuration file: %s';
+export const ERROR_LOADING_CONFIG_FILE = 'Error loading configuration file: %s';
+export const NO_CONNECTIONS_CONFIGURED = 'No database connections are configured. Please do configure properly and start pglistend again.';

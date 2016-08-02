@@ -1,0 +1,12 @@
+default:
+    connection:
+        host: localhost
+        port: 5432
+        max: 2
+        idleTimeoutMillis: 10000
+
+# Include configuration files database connections you want to use
+connections:
+    - /path/to/.pglistend-connection.yml
+    - /path/to/another/.pglistend-connection.yml
+

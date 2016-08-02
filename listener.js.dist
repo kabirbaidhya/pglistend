@@ -1,0 +1,11 @@
+module.exports = function(h) {
+    return {
+        'channel_1': function(payload) {
+            // Do something
+        },
+
+        'channel_2': function(payload) {
+            // Do something
+        }
+    };
+};
