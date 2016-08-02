@@ -1,12 +1,34 @@
-import Yaml from 'yamljs';
-import query from './query';
 import {Pool} from 'pg';
+import Yaml from 'yamljs';
+import {yellow} from 'chalk';
+import deepAssign from 'deep-assign';
+
+import query from './query';
 import {log, error} from './util';
 import {throttle, debounce} from './util';
 import {isObject, isFunction} from './util';
+import * as msg from './messages/common';
 
 export function resolveConfig(file) {
-    return Yaml.load(file);
+    let config = loadConfig(file);
+
+    config.connections = config.connections.map(
+        path => deepAssign({}, loadConfig(path), config.default)
+    );
+
+    return config;
+}
+
+function loadConfig(file) {
+    try {
+        let config = Yaml.load(file);
+
+        log(msg.LOADED_CONFIG_FILE, yellow(file));
+        return config;
+    } catch (e) {
+        error(msg.ERROR_LOADING_CONFIG_FILE, file);
+        throw e;
+    }
 }
 
 export function resolveHandlers(config) {

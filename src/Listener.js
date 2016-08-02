@@ -1,9 +1,9 @@
 import {Client, Pool} from 'pg';
 import {format} from 'util';
 import {yellow, green, red, dim} from 'chalk';
+
 import {halt} from './program';
 import {log, error} from './util';
-
 import * as msg from './messages/common';
 
 class Listener {
@@ -58,14 +58,15 @@ class Listener {
         }
 
         // TODO: Delegate CPU-intensive jobs to a task queue or a separate process.
-        
+
         handlers.forEach(callback => callback(payload));
     }
 
     handle(notification) {
+        const database = this.client.database;
         const {channel, payload: str} = notification;
 
-        log(msg.RECEIVED_NOTIFICATION, green(channel), dim(str || '(empty)'));
+        log(msg.RECEIVED_NOTIFICATION, green(database + ':' + channel), dim(str || '(empty)'));
 
         try {
             const payload = this.parsePayload(str);
@@ -78,8 +79,10 @@ class Listener {
     }
 
     listenTo(channel) {
+        const database = this.client.database;
+
         this.client.query(`LISTEN ${channel}`).then(() => {
-            log(msg.STARTED_LISTENING, green(channel));
+            log(msg.STARTED_LISTENING, green(database + ':' + channel));
 
             // Warn if handlers are not registered for the channels being listened to
             if (!Array.isArray(this.handlers[channel])) {

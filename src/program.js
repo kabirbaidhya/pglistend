@@ -43,9 +43,8 @@ export function halt(err) {
 function listen(args) {
     let config = resolveConfig(args.config);
 
-    for (let i = 0; i < config.connections.length; i++) {
-        let configuration = config.connections[i];
-        let listener = new Listener(configuration, resolveHandlers(configuration));
+    for (let connection of config.connections) {
+        let listener = new Listener(connection, resolveHandlers(connection));
 
         listener.listen();
     }
