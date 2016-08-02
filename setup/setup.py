@@ -33,6 +33,20 @@ WantedBy=multi-user.target
 
 # Configuration file template
 CONFIG_TEMPLATE = '''
+default:
+    connection:
+        host: localhost
+        port: 5432
+        max: 2
+        idleTimeoutMillis: 10000
+
+# Include configuration files database connections you want to use
+connections:
+#   - path/to/connection-config.yml
+'''
+
+# Connection config file template
+CONNECTION_CONFIG_TEMPLATE = '''
 # Change the following configuration parameters according to your need.
 
 # postgresql connection
@@ -57,11 +71,18 @@ scripts:
 DEFAULT_LISTENER_TEMPLATE = '''
 // Here you can define handlers for each of the channels
 // that are being LISTENed.
-module.exports = {
-    // 'boom': function(payload) {
-    //     console.log('Received notification on channel "boom"', payload);
-    // }
+module.exports = function(h) {
+    return {
+        'channel_1': function(payload) {
+            // Do something
+        },
+
+        'channel_2': function(payload) {
+            // Do something
+        }
+    };
 };
+
 '''
 
 # Constants

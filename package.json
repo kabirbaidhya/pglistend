@@ -50,6 +50,9 @@
   "files": [
     "bin/",
     "dist/",
-    "setup"
+    "setup",
+    ".pglistend.yml.dist",
+    ".pglistend-connection.yml.dist",
+    "listener.js.dist"
   ]
 }
