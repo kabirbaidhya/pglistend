@@ -16,7 +16,7 @@ export function run() {
         .description('pglisten - Postgres LISTEN CLI tool')
         .usage('--config=<path>')
         .option('-c, --config <path>', 'Configuration file to use');
-    
+
     prog.command('setup-daemon')
         .description('Setup pglistend service on this system')
         .option('-C, --configure', 'Configure the daemon during setup')
@@ -42,6 +42,10 @@ export function halt(err) {
 
 function listen(args) {
     let config = resolveConfig(args.config);
+
+    if (config.connections.length === 0) {
+        throw new Error(msg.NO_CONNECTIONS_CONFIGURED);
+    }
 
     for (let connection of config.connections) {
         let listener = new Listener(connection, resolveHandlers(connection));

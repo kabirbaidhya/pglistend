@@ -12,11 +12,15 @@ import * as msg from './messages/common';
 export function resolveConfig(file) {
     let config = loadConfig(file);
 
-    config.connections = config.connections.map(
-        path => deepAssign({}, loadConfig(path), config.default)
-    );
-
+    config.connections = resolveConnections(config.connections, config.default);
+    
     return config;
+}
+
+function resolveConnections(files, defaults = {}) {
+    if (!Array.isArray(files)) return [];
+
+    return files.map(path => deepAssign({}, loadConfig(path), defaults));
 }
 
 function loadConfig(file) {
