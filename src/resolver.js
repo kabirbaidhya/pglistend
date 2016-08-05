@@ -13,7 +13,7 @@ export function resolveConfig(file) {
     let config = loadConfig(file);
 
     config.connections = resolveConnections(config.connections, config.default);
-    
+
     return config;
 }
 
@@ -36,7 +36,7 @@ function loadConfig(file) {
 }
 
 export function resolveHandlers(config) {
-    let scripts = config.scripts || [];
+    let scripts = Array.isArray(config.scripts) ? config.scripts : [];
 
     if (scripts.length === 0) {
         error('Warning: No listener scripts are configured.');

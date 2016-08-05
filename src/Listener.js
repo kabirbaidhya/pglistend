@@ -17,6 +17,8 @@ class Listener {
     listen() {
         let {client, config: {connection, channels}} = this;
 
+        channels = Array.isArray(channels) ? channels : [];
+
         if (channels.length === 0) {
             throw new Error(msg.NO_CHANNELS_TO_LISTEN);
         }
