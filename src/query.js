@@ -1,4 +1,5 @@
 import {log, error} from './util';
+import logger from './logging/logger';
 
 /**
  * @return {Promise}
@@ -10,7 +11,7 @@ export default function query(sql, values) {
                 let message = `Connection Error: ${err}`;
                 
                 reject(message);
-                error(message);
+                logger.error(message);
                 
                 return;
             }
@@ -22,12 +23,12 @@ export default function query(sql, values) {
                     let message = `Query error: ${err}`;
                     
                     reject(message);
-                    error(message);
+                    logger.error(message);
                     
                     return;
                 }
 
-                log('Executed query: ', sql);
+                logger.info('Executed query: ', sql);
                 resolve(result);
             });
         });

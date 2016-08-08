@@ -33,6 +33,7 @@
     "lodash.debounce": "^4.0.6",
     "lodash.throttle": "^4.0.1",
     "pg": "^6.0.1",
+    "winston": "^2.2.0",
     "yamljs": "^0.2.8"
   },
   "devDependencies": {

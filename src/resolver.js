@@ -4,10 +4,10 @@ import {yellow} from 'chalk';
 import deepAssign from 'deep-assign';
 
 import query from './query';
-import {log, error} from './util';
 import {throttle, debounce} from './util';
 import {isObject, isFunction} from './util';
 import * as msg from './messages/common';
+import logger from './logging/logger';
 
 export function resolveConfig(file) {
     let config = loadConfig(file);
@@ -27,10 +27,10 @@ function loadConfig(file) {
     try {
         let config = Yaml.load(file);
 
-        log(msg.LOADED_CONFIG_FILE, yellow(file));
+        logger.info(msg.LOADED_CONFIG_FILE, yellow(file));
         return config;
     } catch (e) {
-        error(msg.ERROR_LOADING_CONFIG_FILE, file);
+        logger.error(msg.ERROR_LOADING_CONFIG_FILE, file);
         throw e;
     }
 }
@@ -39,7 +39,7 @@ export function resolveHandlers(config) {
     let scripts = Array.isArray(config.scripts) ? config.scripts : [];
 
     if (scripts.length === 0) {
-        error('Warning: No listener scripts are configured.');
+        logger.warn('No listener scripts are configured.');
 
         return {};
     }
@@ -56,7 +56,8 @@ function getCallbackHelpers(config) {
     let pool = new Pool(config.connection);
 
     return {
-        log, error,
+        log: logger.info,
+        error: logger.error,
         throttle, debounce,
         query: query.bind(pool)
     };
@@ -65,7 +66,7 @@ function getCallbackHelpers(config) {
 function resolveHandlersFromFile(file, helpers) {
     let func = require(file);
 
-    if (!isFunction(require(file))) {
+    if (!isFunction(func)) {
         throw new Error(`Invalid listener script provided. The script file "${file}" should export a function.`);
     }
 
@@ -89,7 +90,7 @@ function resolveForScripts(scripts, helpers) {
                 let callback = handlers[key];
 
                 if (!isFunction(callback)) {
-                    error(`Invalid callback function specified for key "${key}" on file "${file}"`);
+                    logger.error(`Invalid callback function specified for key "${key}" on file "${file}"`);
 
                     continue;
                 }
@@ -101,7 +102,7 @@ function resolveForScripts(scripts, helpers) {
                 resolved[key].push(callback);
             }
         } catch (e) {
-            error(e.message);
+            logger.error(e.message);
         }
     });
 
