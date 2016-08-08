@@ -4,7 +4,8 @@ import prog from 'commander';
 import {spawnSync} from 'child_process';
 
 import Listener from './Listener';
-import {error} from './util';
+import {error, isString} from './util';
+import logger from './logging/logger';
 import * as msg from './messages/common';
 import {resolveConfig, resolveHandlers} from './resolver';
 
@@ -36,7 +37,7 @@ export function run() {
  * Note: Should be called only in case of fatal error.
  */
 export function halt(err) {
-    error(err || msg.GENERIC_ERROR_MESSAGE);
+    logger.error(isString(err) ? err : (err.message || msg.GENERIC_ERROR_MESSAGE));
     process.exit(1);
 }
 

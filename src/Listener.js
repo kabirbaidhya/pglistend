@@ -4,6 +4,7 @@ import {yellow, green, red, dim} from 'chalk';
 
 import {halt} from './program';
 import {log, error} from './util';
+import logger from './logging/logger';
 import * as msg from './messages/common';
 
 class Listener {
@@ -28,10 +29,10 @@ class Listener {
                 halt(err);
             }
 
-            log(msg.DATABASE_CONNECTED, yellow(connection.database));
+            logger.info(msg.DATABASE_CONNECTED, yellow(connection.database));
         });
 
-        client.on('notice', msg => log(msg));
+        client.on('notice', msg => logger.info(msg));
         client.on('notification', notification => this.handle(notification));
 
         channels.forEach(channel => this.listenTo(channel));
@@ -56,7 +57,7 @@ class Listener {
         const handlers = this.handlers[channel];
 
         if (!Array.isArray(handlers)) {
-            throw new Error(format(msg.NO_HANDLERS_FOUND, channel));
+            throw new Error(format(msg.WARN_NO_HANDLERS_FOUND, channel));
         }
 
         // TODO: Delegate CPU-intensive jobs to a task queue or a separate process.
@@ -68,7 +69,7 @@ class Listener {
         const database = this.client.database;
         const {channel, payload: str} = notification;
 
-        log(msg.RECEIVED_NOTIFICATION, green(database + ':' + channel), dim(str || '(empty)'));
+        logger.info(msg.RECEIVED_NOTIFICATION, green(database + ':' + channel), dim(str || '(empty)'));
 
         try {
             const payload = this.parsePayload(str);
@@ -84,11 +85,11 @@ class Listener {
         const database = this.client.database;
 
         this.client.query(`LISTEN ${channel}`).then(() => {
-            log(msg.STARTED_LISTENING, green(database + ':' + channel));
+            logger.info(msg.STARTED_LISTENING, green(database + ':' + channel));
 
             // Warn if handlers are not registered for the channels being listened to
             if (!Array.isArray(this.handlers[channel])) {
-                error(format(msg.NO_HANDLERS_FOUND, channel));
+                logger.warn(msg.WARN_NO_HANDLERS_FOUND, channel);
             }
         });
     }
