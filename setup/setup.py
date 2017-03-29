@@ -221,37 +221,42 @@ def check_status():
         pass
 
 
-###############################################################################
-# Setup Process
-print()
-print('Setup - pglistend - Postgres LISTEN Daemon')
-print('------------------------------------------')
+def setup():
+    '''
+    Setup Process
+    '''
+    print()
+    print('Setup - pglistend - Postgres LISTEN Daemon')
+    print('------------------------------------------')
 
-# Ensure the package is installed globally on the system
-ensure_package_installed(PACKAGE)
+    # Ensure the package is installed globally on the system
+    ensure_package_installed(PACKAGE)
 
-# Ensure the pglisten cli command exists and get its path
-EXEC_PATH = get_exec_path(EXEC_NAME)
+    # Ensure the pglisten cli command exists and get its path
+    exec_path = get_exec_path(EXEC_NAME)
 
-# Create the application directory
-mkdir(BASE_DIRECTORY)
+    # Create the application directory
+    mkdir(BASE_DIRECTORY)
 
-# Create a default listener file
-create_file(DEFAULT_LISTENER_FILE, DEFAULT_LISTENER_TEMPLATE)
+    # Create a default listener file
+    create_file(DEFAULT_LISTENER_FILE, DEFAULT_LISTENER_TEMPLATE)
 
-# Create application config file
-create_config_file(CONFIG_FILE)
+    # Create application config file
+    create_config_file(CONFIG_FILE)
 
-# Create the systemd daemon unit file
-create_systemd_unit_file('/etc/systemd/system/pglistend.service', EXEC_PATH)
+    # Create the systemd daemon unit file
+    create_systemd_unit_file(
+        '/etc/systemd/system/pglistend.service', exec_path)
 
-# Finally enable the daemon and check status
-enable_daemon()
-check_status()
+    # Finally enable the daemon and check status
+    enable_daemon()
+    check_status()
 
-print(ok_t('\nAll done!!'))
-print(
-    'Please manually edit the configuration file {0}. \n'
-    'And finally start the service using {1}.'
-    .format(out_t(CONFIG_FILE), out_t('systemctl start ' + PACKAGE))
-)
+    print(ok_t('\nAll done!!'))
+    print(
+        'Please manually edit the configuration file {0}. \n'
+        'And finally start the service using {1}.'
+        .format(out_t(CONFIG_FILE), out_t('systemctl start ' + PACKAGE))
+    )
+
+setup()
