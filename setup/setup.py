@@ -223,8 +223,9 @@ def check_status():
 
 ###############################################################################
 # Setup Process
-print('\nSetup - pglistend - Postgres LISTEN Daemon')
-print('---------------------------------------------------')
+print()
+print('Setup - pglistend - Postgres LISTEN Daemon')
+print('------------------------------------------')
 
 # Ensure the package is installed globally on the system
 ensure_package_installed(PACKAGE)
