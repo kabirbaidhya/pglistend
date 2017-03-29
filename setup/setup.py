@@ -118,14 +118,15 @@ def err_t(s):
 
 # Just a simple command to execute shell commands and display the output
 def exec_cmd(cmd):
-    print cmd_t('> {}'.format(cmd))
+    print(cmd_t('> {}'.format(cmd)))
 
     p = Popen(cmd.split(' '), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     output = ''
 
-    for line in iter(p.stdout.readline, b''):
-        print out_t('| ' + line.rstrip())
+    for raw_line in iter(p.stdout.readline, b''):
+        line = raw_line.decode('utf-8')
+        print(out_t('| ' + line.rstrip()))
         output += line
 
     returncode = p.wait()
@@ -133,19 +134,19 @@ def exec_cmd(cmd):
     if returncode != 0:
         raise CalledProcessError(returncode, cmd)
 
-    print ''
+    print('')
 
     return output.rstrip()
 
 
 def ensure_package_installed(package_name):
-    print info_t('Ensure {0} is installed'.format(package_name))
+    print(info_t('Ensure {0} is installed'.format(package_name)))
 
     try:
         # Ensure pglistend package is installed on the system globally
         exec_cmd('npm list -g {}'.format(package_name))
     except CalledProcessError:
-        print err_t('Warning: npm list returned non-zero exit code.')
+        print(err_t('Warning: npm list returned non-zero exit code.'))
 
 
 def get_exec_path(exec_name):
@@ -161,7 +162,7 @@ def get_exec_path(exec_name):
 
 
 def mkdir(directory):
-    print info_t('Create directory {0}'.format(directory))
+    print(info_t('Create directory {0}'.format(directory)))
 
     try:
         exec_cmd('mkdir -p {0}'.format(directory))
@@ -172,12 +173,12 @@ def mkdir(directory):
 
 
 def create_file(filename, contents):
-    print info_t('Write to file {0}'.format(filename))
+    print(info_t('Write to file {0}'.format(filename)))
 
     try:
         with open(filename, 'w') as f:
             f.write(contents)
-    except Exception, e:
+    except Exception as e:
         raise SystemExit(err_t('Error: ' + str(e)))
 
 
@@ -201,7 +202,7 @@ def create_config_file(filename):
 
 
 def enable_daemon():
-    print info_t('Enable the service')
+    print(info_t('Enable the service'))
 
     try:
         # Ensure pglistend package is installed on the system globally
@@ -211,7 +212,7 @@ def enable_daemon():
 
 
 def check_status():
-    print info_t('Check status')
+    print(info_t('Check status'))
 
     try:
         exec_cmd('systemctl is-enabled {0}'.format(PACKAGE))
@@ -220,36 +221,42 @@ def check_status():
         pass
 
 
-###############################################################################
-# Setup Process
-print '\nSetup - pglistend - Postgres LISTEN Daemon'
-print '---------------------------------------------------'
+def setup():
+    '''
+    Setup Process
+    '''
+    print()
+    print('Setup - pglistend - Postgres LISTEN Daemon')
+    print('------------------------------------------')
 
-# Ensure the package is installed globally on the system
-ensure_package_installed(PACKAGE)
+    # Ensure the package is installed globally on the system
+    ensure_package_installed(PACKAGE)
 
-# Ensure the pglisten cli command exists and get its path
-EXEC_PATH = get_exec_path(EXEC_NAME)
+    # Ensure the pglisten cli command exists and get its path
+    exec_path = get_exec_path(EXEC_NAME)
 
-# Create the application directory
-mkdir(BASE_DIRECTORY)
+    # Create the application directory
+    mkdir(BASE_DIRECTORY)
 
-# Create a default listener file
-create_file(DEFAULT_LISTENER_FILE, DEFAULT_LISTENER_TEMPLATE)
+    # Create a default listener file
+    create_file(DEFAULT_LISTENER_FILE, DEFAULT_LISTENER_TEMPLATE)
 
-# Create application config file
-create_config_file(CONFIG_FILE)
+    # Create application config file
+    create_config_file(CONFIG_FILE)
 
-# Create the systemd daemon unit file
-create_systemd_unit_file('/etc/systemd/system/pglistend.service', EXEC_PATH)
+    # Create the systemd daemon unit file
+    create_systemd_unit_file(
+        '/etc/systemd/system/pglistend.service', exec_path)
 
-# Finally enable the daemon and check status
-enable_daemon()
-check_status()
+    # Finally enable the daemon and check status
+    enable_daemon()
+    check_status()
 
-print ok_t('\nAll done!!')
-print(
-    'Please manually edit the configuration file {0}. \n'
-    'And finally start the service using {1}.'
-    .format(out_t(CONFIG_FILE), out_t('systemctl start ' + PACKAGE))
-)
+    print(ok_t('\nAll done!!'))
+    print(
+        'Please manually edit the configuration file {0}. \n'
+        'And finally start the service using {1}.'
+        .format(out_t(CONFIG_FILE), out_t('systemctl start ' + PACKAGE))
+    )
+
+setup()
